@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace：命名空间，是用于绑定Dao接口的，即面向接口编程，必须写为被绑定接口的全类名-->
+<mapper namespace="com.nyanner.govii.elementary.mapper.KnowledgeAuditMapper">
+    <sql id="selectKnowledgeAuditVo">
+        select id, knowledge_id, reviewer_id, reject_reason, process_time
+        from knowledge_audit
+    </sql>
+
+    <select id="findByReviewerId" resultType="KnowledgeAudit">
+        <include refid="selectKnowledgeAuditVo"></include>
+        where reviewer_id = #{id}
+    </select>
+
+    <select id="findKnowledgeIdById" resultType="Long">
+        select knowledge_id
+        from knowledge_audit
+        where id = #{id}
+    </select>
+
+    <insert id="addKnowledgeAudit" parameterType="Knowledge" useGeneratedKeys="true" keyProperty="id">
+        insert into knowledge_audit(
+        <if test="knowledgeId != null and knowledgeId != ''">knowledge_id,</if>
+        <if test="reviewerId != null and reviewerId != ''">reviewer_id,</if>
+        <if test="rejectReason != null and rejectReason != ''">reject_reason,</if>
+        process_time
+        )values(
+        <if test="knowledgeId != null and knowledgeId != ''">#{knowledgeId},</if>
+        <if test="reviewerId != null and reviewerId != ''">#{reviewerId},</if>
+        <if test="rejectReason != null and rejectReason != ''">#{rejectReason},</if>
+        sysdate()
+        )
+    </insert>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

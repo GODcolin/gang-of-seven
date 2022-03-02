@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace：命名空间，是用于绑定Dao接口的，即面向接口编程，必须写为被绑定接口的全类名-->
+<mapper namespace="com.nyanner.govii.elementary.mapper.SysOperLogMapper">
+
+    <sql id="selectOperLogVo">
+        select oper_id,
+               title,
+               business_type,
+               method,
+               request_method,
+               operator_type,
+               oper_name,
+               dept_name,
+               oper_url,
+               oper_ip,
+               oper_location,
+               oper_param,
+               json_result,
+               status,
+               error_msg,
+               oper_time
+        from sys_oper_log
+    </sql>
+
+    <insert id="insertOperlog" parameterType="SysOperLog">
+        insert into sys_oper_log(title, business_type, method, request_method, operator_type, oper_name, dept_name,
+                                 oper_url, oper_ip, oper_location, oper_param, json_result, status, error_msg)
+        values (#{title}, #{businessType}, #{method}, #{requestMethod}, #{operatorType}, #{operName}, #{deptName},
+                #{operUrl}, #{operIp}, #{operLocation}, #{operParam}, #{jsonResult}, #{status}, #{errorMsg})
+    </insert>
+
+    <select id="selectOperLogList" parameterType="SysOperLog" resultType="SysOperLog">
+        <include refid="selectOperLogVo"></include>
+        <where>
+            <if test="title != null and title != ''">
+                and title like concat('%',#{title},'%')
+            </if>
+            <if test="businessType != null and businessType != ''">
+                and business_type = #{businessType}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="operName != null and operName != ''">
+                AND oper_name like concat('%', #{operName}, '%')
+            </if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(oper_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                and date_format(oper_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+        </where>
+        order by oper_id desc
+    </select>
+
+    <delete id="deleteOperLogByIds" parameterType="Long">
+        delete from sys_oper_log where oper_id in
+        <foreach collection="operIds" item="operId" open="(" separator="," close=")">
+            #{operId}
+        </foreach>
+    </delete>
+
+    <select id="selectOperLogById" parameterType="Long" resultType="SysOperLog">
+        <include refid="selectOperLogVo"/>
+        where oper_id = #{operId}
+    </select>
+</mapper>

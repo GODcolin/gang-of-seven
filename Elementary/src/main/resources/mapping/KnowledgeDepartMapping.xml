@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace：命名空间，是用于绑定Dao接口的，即面向接口编程，必须写为被绑定接口的全类名-->
+<mapper namespace="com.nyanner.govii.elementary.mapper.KnowledgeDepartMapper">
+
+    <delete id="deleteKnowledgeDepartByKnowledgeId">
+        delete
+        from knowledge_depart
+        where knowledge_id = #{konwledgeId}
+    </delete>
+
+    <insert id="batchKnowledgeDepart">
+        insert into knowledge_depart(knowledge_id,depart_id)
+        values
+        <foreach collection="depts" index="index" item="item" separator=",">
+            (#{knowledgeId},#{item.deptId})
+        </foreach>
+    </insert>
+</mapper>

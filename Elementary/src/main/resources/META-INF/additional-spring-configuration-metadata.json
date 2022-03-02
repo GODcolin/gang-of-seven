@@ -1,0 +1,39 @@
+{
+  "properties": [
+    {
+      "name": "govii.app.jwt-secret",
+      "type": "java.lang.String",
+      "description": "JWT密钥."
+    },
+    {
+      "name": "govii.app.jwt-expiration-ms",
+      "type": "java.lang.String",
+      "description": "JWT过期时间."
+    },
+    {
+      "name": "qiniu.accessKey",
+      "type": "java.lang.String",
+      "description": "Description for qiniu.accessKey."
+    },
+    {
+      "name": "qiniu.secretKey",
+      "type": "java.lang.String",
+      "description": "Description for qiniu.secretKey."
+    },
+    {
+      "name": "qiniu.bucketname",
+      "type": "java.lang.String",
+      "description": "Description for qiniu.bucketname."
+    },
+    {
+      "name": "qiniu.domain",
+      "type": "java.lang.String",
+      "description": "Description for qiniu.domain."
+    },
+    {
+      "name": "govii.app.captcha.timeout",
+      "type": "java.lang.String",
+      "description": "Description for govii.app.captcha.timeout."
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace：命名空间，是用于绑定Dao接口的，即面向接口编程，必须写为被绑定接口的全类名-->
+<mapper namespace="com.nyanner.govii.elementary.mapper.CommentMapper">
+    <sql id="selectCommentVo">
+        select id, content, create_time, knowledge_id, user_id, parent_id
+        from knowledge_comment
+    </sql>
+    <resultMap id="commentResult" type="Comment">
+        <id column="id" property="id"></id>
+        <result column="content" property="content"></result>
+        <result column="create_time" property="createTime"></result>
+        <result column="knowledge_id" property="knowledgeId"></result>
+        <result column="user_id" property="userId"></result>
+        <result column="parent_id" property="parentId"></result>
+        <result column="nick_name" property="nickName"></result>
+        <result column="avatar" property="avatar"></result>
+        <collection property="childrenComments" select="findCommentsByParentId" column="id"></collection>
+    </resultMap>
+
+    <select id="selectByKnowledgeId" resultMap="commentResult">
+        select id, content, c.create_time, knowledge_id, c.user_id, parent_id, u.nick_name,u.avatar
+        from knowledge_comment c
+                 left join sys_user u on c.user_id = u.user_id
+        where knowledge_id = #{knowledgeId}
+          and parent_id = 0
+        order by c.create_time desc
+    </select>
+
+
+    <select id="findCommentsByParentId" resultMap="commentResult">
+        select id, content, c.create_time, knowledge_id, c.user_id, parent_id, u.nick_name,u.avatar
+        from knowledge_comment c
+                 left join sys_user u on c.user_id = u.user_id
+        where parent_id = #{parentId}
+        order by c.create_time desc
+    </select>
+
+
+    <select id="selectByUserId" resultType="com.nyanner.govii.elementary.model.bean.IndividualComment">
+        select k.title as knowledgeTitle, c.knowledge_id, c.content as commentContent, c.create_time as commentTime
+        from knowledge_comment c
+                 left join knowledge k on c.knowledge_id = k.id
+        where user_id = #{userId}
+    </select>
+
+
+    <insert id="addComment" parameterType="Comment">
+        insert into knowledge_comment(content, knowledge_id, user_id, parent_id)
+        values (#{content}, #{knowledgeId}, #{userId}, #{parentId})
+    </insert>
+
+    <delete id="deleteCommentById">
+        delete
+        from knowledge_comment
+        where id = #{id}
+    </delete>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+

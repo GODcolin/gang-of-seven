@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace：命名空间，是用于绑定Dao接口的，即面向接口编程，必须写为被绑定接口的全类名-->
+<mapper namespace="com.nyanner.govii.elementary.mapper.RankSettingMapper">
+
+    <select id="selectRankSetting" resultType="RankSetting">
+        select limit_time, type
+        from knowledge_rank_setting
+        where user_id = #{userId}
+    </select>
+
+    <update id="updateRankSetting" parameterType="RankSetting">
+        update knowledge_rank_setting
+        set limit_time = #{limitTime},
+            type       = #{type}
+        where user_id = #{userId}
+    </update>
+</mapper>

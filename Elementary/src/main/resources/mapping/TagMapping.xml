@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace：命名空间，是用于绑定Dao接口的，即面向接口编程，必须写为被绑定接口的全类名-->
+<mapper namespace="com.nyanner.govii.elementary.mapper.TagMapper">
+    <sql id="selectTagVo">
+        select id, tag_name
+        from tag
+    </sql>
+
+    <select id="findTagsByKnowledgeId" resultType="Tag">
+        <include refid="selectTagVo"></include>
+        <where>
+            id in (select tag_id from knowledge_tag where knowledge_id = #{id})
+        </where>
+    </select>
+
+    <select id="findAll" resultType="Tag">
+        <include refid="selectTagVo"></include>
+    </select>
+
+    <insert id="addTag">
+        insert into tag(tag_name)
+        values (#{name})
+    </insert>
+
+    <update id="updateTag">
+        update tag
+        set tag_name = #{tagName}
+        where id = #{id}
+    </update>
+
+    <delete id="delTagById" parameterType="Long">
+        delete
+        from tag
+        where id = #{id}
+    </delete>
+
+
+    <select id="findTagsByTagIds" parameterType="List" resultType="Tag">
+        <include refid="selectTagVo"></include>
+        where id in
+        <foreach collection="ids" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="findById" resultType="Tag">
+        <include refid="selectTagVo"></include>
+        where id = #{id}
+    </select>
+
+    <select id="findHotsTagIds" resultType="Long" parameterType="List">
+        select tag_id
+        from knowledge_tag at
+        group by tag_id
+        order by count(1) desc
+        limit #{limit}
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

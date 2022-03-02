@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace：命名空间，是用于绑定Dao接口的，即面向接口编程，必须写为被绑定接口的全类名-->
+<mapper namespace="com.nyanner.govii.elementary.mapper.CategoryMapper">
+
+    <resultMap id="categoryResult" type="Category">
+        <id column="id" property="id" />
+        <result column="category_name" property="categoryName" />
+        <result column="parent_id" property="parentId" />
+
+        <collection property="childrenCategorys" select="findCategoryByParentId" column="id" />
+    </resultMap>
+
+    <sql id="selectCategoryVo">
+        select id, category_name, parent_id
+        from category
+    </sql>
+
+
+    <select id="findAll" parameterType="List" resultMap="categoryResult">
+        <include refid="selectCategoryVo" />
+        where parent_id = 0
+    </select>
+
+
+    <select id="findCategoryByParentId" resultType="Category">
+        <include refid="selectCategoryVo" />
+        where parent_id = #{parentId}
+    </select>
+
+
+    <select id="findCategoryById" parameterType="Long" resultType="Category">
+        <include refid="selectCategoryVo" />
+        where id = #{id}
+    </select>
+
+
+    <insert id="addCategory" parameterType="Category" useGeneratedKeys="true" keyProperty="id">
+        insert into category (`parent_id`, category_name)
+        values (#{parentId}, #{categoryName})
+    </insert>
+
+    <update id="updateCategory">
+        update category
+        set category_name = #{name}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCategoryById">
+        delete
+        from category
+        where id = #{id}
+    </delete>
+
+
+    <select id="findSecondCategory" resultType="Category">
+        <include refid="selectCategoryVo" />
+        where parent_id != 0
+    </select>
+
+
+    <select id="findUserLikeCategory" parameterType="Long" resultType="com.nyanner.govii.elementary.model.bean.UserLikeCategory">
+        select c.id ,count(*) as count
+        from knowledge_likes kl left join knowledge k on kl.knowledge_id = k.id
+                            left join category c on k.category_id = c.id
+                            where kl.user_id=#{userId}
+                            group by c.id
+    </select>
+
+    <select id="findUserCollectionCategory" parameterType="Long" resultType="com.nyanner.govii.elementary.model.bean.UserLikeCategory">
+        select c.id ,count(*) as count
+        from knowledge_collection kc left join knowledge k on kc.knowledge_id = k.id
+                                left join category c on k.category_id = c.id
+                                where kc.user_id=#{userId}
+                                group by c.id
+    </select>
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

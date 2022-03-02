@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace：命名空间，是用于绑定Dao接口的，即面向接口编程，必须写为被绑定接口的全类名-->
+<mapper namespace="com.nyanner.govii.elementary.mapper.TicketMapper">
+
+    <insert id="addTicket" parameterType="Ticket">
+        insert into ticket(`title`, `content`, `creator_id`)
+        values (#{title}, #{content}, #{creatorId})
+    </insert>
+
+    <resultMap id="auditingTicketResult" type="Ticket">
+        <id property="id" column="id"></id>
+        <result property="title" column="title"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="content" column="content"></result>
+
+        <association property="creator" javaType="com.nyanner.govii.elementary.model.bean.User">
+            <id property="userId" column="user_id"></id>
+            <result property="userName" column="nick_name"></result>
+        </association>
+    </resultMap>
+
+    <select id="selectTicketByStatus" resultMap="auditingTicketResult">
+        select t.id, t.title, t.create_time, t.content, u.user_id, u.nick_name
+        from ticket t
+                 left join sys_user u on t.creator_id = u.user_id
+        where t.status = #{status}
+        order by t.create_time desc
+    </select>
+
+
+    <resultMap id="TicketResult" type="Ticket">
+        <id property="id" column="id"></id>
+        <result property="title" column="title"></result>
+        <result property="content" column="content"></result>
+        <result property="receiveTime" column="receive_time"></result>
+        <result property="finishTime" column="finish_time"></result>
+        <result property="status" column="status"></result>
+
+        <association property="creator" javaType="com.nyanner.govii.elementary.model.bean.User">
+            <id property="userId" column="user_id"></id>
+            <result property="userName" column="nick_name"></result>
+        </association>
+    </resultMap>
+
+
+    <select id="selectTicketByUserId" resultMap="TicketResult">
+        select t.id,
+               t.title,
+               t.content,
+               u.user_id,
+               u.nick_name,
+               t.receive_time,
+               t.finish_time,
+               t.status
+        from ticket t
+                 left join sys_user u on t.creator_id = u.user_id
+        where t.status in ('3', '4', '5')
+          and t.receiver_id = #{userId}
+        order by t.receive_time, t.finish_time desc
+    </select>
+
+    <update id="updateTicketStatusById">
+        update ticket
+        set status = #{status}
+        where id = #{ticketId}
+    </update>
+
+    <update id="updateTicketWhenAudit" parameterType="Ticket">
+        update ticket
+        <set>
+            status = #{status},
+            <if test="reason != null and reason != ''">reason = #{reason},</if>
+            auditor_id = #{auditorId},audit_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateTicketWhenReceive" parameterType="Ticket">
+        update ticket
+        <set>
+            status = #{status},
+            receiver_id = #{receiverId},receive_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateTicketWhenFinish" parameterType="Ticket">
+        update ticket
+        <set>
+            status = '4',
+            finish_time = sysdate()
+        </set>
+        where id = #{ticketId}
+    </update>
+
+    <update id="updateTicketWhenClose" parameterType="Ticket">
+        update ticket
+        <set>
+            status = '5',
+            close_time = sysdate()
+        </set>
+        where id = #{ticketId}
+    </update>
+
+
+    <resultMap id="FinishAuditTicketResult" type="Ticket">
+        <id property="id" column="id"></id>
+        <result property="title" column="title"></result>
+        <result property="content" column="content"></result>
+        <result property="knowledgeId" column="knowledge_id"></result>
+        <result property="finishTime" column="finish_time"></result>
+
+        <association property="receiver" javaType="com.nyanner.govii.elementary.model.bean.User">
+            <id property="userId" column="user_id"></id>
+            <result property="userName" column="nick_name"></result>
+        </association>
+    </resultMap>
+    <select id="selectTicketWhenFinishAudit" resultMap="FinishAuditTicketResult">
+        select t.id,
+               t.title,
+               t.content,
+               u.user_id,
+               u.nick_name,
+               kt.knowledge_id,
+               t.finish_time
+        from ticket t
+                 left join sys_user u on t.receiver_id = u.user_id
+                 left join knowledge_ticket kt on t.id = kt.ticket_id
+        where t.status = '4'
+        order by t.finish_time desc
+    </select>
+
+
+    <update id="updateTicketNotPassFinish" parameterType="Ticket">
+        update ticket
+        set status            = '3',
+            not_finish_reason = #{notFinishReason}
+        where id = #{id}
+    </update>
+
+
+    <select id="selectCreatedTicketByUserId" resultType="com.nyanner.govii.elementary.model.bean.IndividualTicket">
+        select id, title, content, create_time, status
+        from ticket
+        where creator_id = #{userId}
+
+    </select>
+
+
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace：命名空间，是用于绑定Dao接口的，即面向接口编程，必须写为被绑定接口的全类名-->
+<mapper namespace="com.nyanner.govii.elementary.mapper.KnowledgeVersionMapper">
+    <sql id="selectKnowledgeVersionVo">
+        select id,
+               version_name,
+               knowledge_id,
+               create_time,
+               creator_id,
+               newversion_id
+        from knowledge_version
+    </sql>
+
+    <select id="findByNewVersionId" resultType="KnowledgeVersion">
+        <include refid="selectKnowledgeVersionVo"></include>
+        where newversion_id != #{id}
+    </select>
+
+    <select id="findById" resultType="KnowledgeVersion">
+        <include refid="selectKnowledgeVersionVo"></include>
+        where id = #{id}
+    </select>
+
+    <select id="findByKnowledgeId" resultType="KnowledgeVersion">
+        <include refid="selectKnowledgeVersionVo"></include>
+        where knowledge_id = #{knowledgeId}
+    </select>
+
+
+</mapper>
